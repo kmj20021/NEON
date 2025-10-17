@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:f_neon/accept.dart';
 
 class LoginPage extends StatelessWidget {
   const LoginPage({super.key});
@@ -16,7 +17,7 @@ class LoginPage extends StatelessWidget {
           SizedBox(height: 10),
           pw(),
           SizedBox(height: 50),
-          login(),
+          login(context),
           SizedBox(height: 70),
           find(),
           SizedBox(height: 70),
@@ -41,10 +42,7 @@ class LoginPage extends StatelessWidget {
             const SizedBox(width: 4),
             const Text(
               '프로해빗',
-              style: TextStyle(
-                fontSize: 19,
-                fontWeight: FontWeight.bold,
-              ),
+              style: TextStyle(fontSize: 19, fontWeight: FontWeight.bold),
             ),
           ],
         ),
@@ -52,7 +50,7 @@ class LoginPage extends StatelessWidget {
     );
   }
 
-  Widget id(){
+  Widget id() {
     return Align(
       child: Column(
         children: [
@@ -61,48 +59,50 @@ class LoginPage extends StatelessWidget {
             height: 50,
             child: TextField(
               decoration: InputDecoration(
-                  border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12)
-                  ),
-                  labelText: "아이디"
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                labelText: "아이디",
               ),
             ),
-          )
+          ),
         ],
       ),
     );
   }
 
-
-  Widget pw(){
+  Widget pw() {
     return Align(
       child: Column(
         children: [
           Container(
             width: 500,
             height: 50,
-            child:
-            TextField(
+            child: TextField(
               obscureText: true,
               decoration: InputDecoration(
-                  border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12)
-                  ),
-                  labelText: '비밀번호'
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                labelText: '비밀번호',
               ),
             ),
-          )
+          ),
         ],
       ),
     );
   }
 
-  Widget login(){
-    return   Align(
+  Widget login(BuildContext context) {
+    return Align(
       child: Column(
         children: [
           InkWell(
-            onTap: (){
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => AcceptPage()),
+              );
               print('로그인2');
             },
             child: Container(
@@ -113,47 +113,43 @@ class LoginPage extends StatelessWidget {
                 borderRadius: BorderRadius.circular(12),
               ),
               alignment: Alignment.center,
-              child:
-              Text('로그인',
+              child: Text(
+                '로그인',
                 style: TextStyle(
                   color: Colors.white,
                   fontWeight: FontWeight.bold,
-                ),),
-
+                ),
+              ),
             ),
           ),
-
         ],
       ),
     );
-
   }
 
-  Widget find(){
+  Widget find() {
     return Container(
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Text('회원가입',style: TextStyle(color: Colors.grey),),
-          SizedBox(width: 16,),
-          Text('아이디/비밀번호 찾기',style: TextStyle(color: Colors.grey),)
+          Text('회원가입', style: TextStyle(color: Colors.grey)),
+          SizedBox(width: 16),
+          Text('아이디/비밀번호 찾기', style: TextStyle(color: Colors.grey)),
         ],
       ),
     );
   }
 
-  Widget logo(){
+  Widget logo() {
     return Container(
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Image.asset('assets/google.png',width: 40,height: 40,),
-          SizedBox(width: 20,),
-          Image.asset('assets/ka1.png', width: 40, height: 40,)
+          Image.asset('assets/google.png', width: 40, height: 40),
+          SizedBox(width: 20),
+          Image.asset('assets/ka1.png', width: 40, height: 40),
         ],
       ),
     );
   }
-
-
 }
