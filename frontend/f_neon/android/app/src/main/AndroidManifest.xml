@@ -1,4 +1,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- 안드로이드 앱이 인터넷 접근이 가능하도록 권한 요청-->
+    <uses-permission android:name="android.permission.INTERNET"/>
+
     <application
         android:label="f_neon"
         android:name="${applicationName}"
