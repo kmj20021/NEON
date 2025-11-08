@@ -11,3 +11,6 @@ backend.main:app => <모듈경로>:<FastAPI 객체 이름>
                     다른 기기에서 접근하고 싶으면 --host 0.0.0.0으로 변경
 --port 8000 => 서버가 열릴 포트 번호
 ***
+
+JWT의존성을 위해 다음 코드를 실행 해 주세요.(1번만 실행)
+pip install fastapi uvicorn[standard] python-jose[cryptography] passlib[bcrypt] python-dotenv
