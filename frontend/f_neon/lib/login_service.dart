@@ -2,21 +2,32 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
+// 웹 감지
+import 'package:flutter/foundation.dart' show kIsWeb;
+// 모바일/데스크톱에서만 사용
 import 'dart:io' show Platform;
 
 class LoginService {
-  // 에뮬레이터 환경에 따라 조정
-  static String get baseUrl { //getter (속성처럼 보이는)함수
-    if (Platform.isAndroid) return 'http://10.0.2.2:8000'; // Android Emulator → host PC
-    return 'http://localhost:8000'; // PC, iOS Simulator
+  // 환경별 기본 URL
+  static String get baseUrl {
+    // 1) 웹은 Platform 접근 금지
+    if (kIsWeb) {
+      return 'http://localhost:8000';
+    }
+    // 2) 모바일/데스크톱만 Platform 접근
+    if (Platform.isAndroid) {
+      return 'http://10.0.2.2:8000'; // Android Emulator → Host PC
+    }
+    // iOS 시뮬레이터/데스크톱
+    return 'http://localhost:8000';
   }
 
   final _storage = const FlutterSecureStorage();
-  static const _kAccess = 'access_token'; 
+  static const _kAccess = 'access_token';
   static const _kRefresh = 'refresh_token';
 
-  /// 비동기 처리 로그인
-  Future<String> login(String id, String pw) async { //Future<String> 나중에 받은 데이터를 String으로 반환
+  /// 로그인
+  Future<String> login(String id, String pw) async {
     final res = await http.post(
       Uri.parse('$baseUrl/login'),
       headers: {'Content-Type': 'application/json'},
@@ -62,12 +73,10 @@ class LoginService {
     String? access = await _storage.read(key: _kAccess);
     if (access == null) return {};
 
-    // (선택) Access 만료 시 자동 갱신
     if (JwtDecoder.isExpired(access)) {
       await _refreshAccess();
       access = await _storage.read(key: _kAccess);
     }
-
     return access != null ? {'Authorization': 'Bearer $access'} : {};
   }
 
@@ -122,7 +131,7 @@ class LoginService {
     throw Exception(_safeErr(res.body));
   }
 
-  /// 에러 처리 함수
+  /// 에러 메시지 파싱
   String _safeErr(String body) {
     try {
       final json = jsonDecode(body);

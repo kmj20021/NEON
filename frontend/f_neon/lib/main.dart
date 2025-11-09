@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'login.dart'; // LoginPage 클래스가 있는 파일 import
+import 'login_page.dart'; // LoginPage 클래스가 있는 파일 import
 //import 'package:f_neon/accept.dart';
 
 void main() {

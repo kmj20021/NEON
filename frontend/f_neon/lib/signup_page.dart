@@ -4,19 +4,23 @@ import 'login_service.dart';
 class SignUpPage extends StatefulWidget {
   const SignUpPage({super.key});
 
+  // 상태 관리
   @override
   State<SignUpPage> createState() => _SignUpPageState();
 }
 
 class _SignUpPageState extends State<SignUpPage> {
-  final _svc = LoginService();
-  final _idCtrl = TextEditingController();
-  final _pwCtrl = TextEditingController();
-  final _pw2Ctrl = TextEditingController();
+  final _svc = LoginService(); // 에뮬레이터에 따라 다른 URL 사용
+  final _idCtrl = TextEditingController(); // ID 입력 컨트롤러 (라이브러리)
+  final _pwCtrl = TextEditingController(); // 비밀번호 입력 컨트롤러 (라이브러리)
+  final _pw2Ctrl = TextEditingController(); // 비밀번호 확인 입력 컨트롤러 (라이브러리)
 
+  // 로딩 상태, 메시지
   bool _loading = false;
   String? _msg;
 
+
+  // 회원가입 함수
   Future<void> _doSignUp() async {
     setState(() {
       _msg = null;
@@ -40,6 +44,7 @@ class _SignUpPageState extends State<SignUpPage> {
 
       final msg = await _svc.signup(id, pw);
 
+      // 성공 시 메시지 표시 후 이전 화면으로 복귀
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
       Navigator.pop(context, true); // 로그인 화면으로 복귀
@@ -50,6 +55,7 @@ class _SignUpPageState extends State<SignUpPage> {
     }
   }
 
+  // 리소스 해제 (자원 정리)
   @override
   void dispose() {
     _idCtrl.dispose();
@@ -58,6 +64,7 @@ class _SignUpPageState extends State<SignUpPage> {
     super.dispose();
   }
 
+  // UI 빌드
   @override
   Widget build(BuildContext context) {
     return Scaffold(
