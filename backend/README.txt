@@ -14,3 +14,8 @@ backend.main:app => <모듈경로>:<FastAPI 객체 이름>
 
 JWT의존성을 위해 다음 코드를 실행 해 주세요.(1번만 실행)
 pip install fastapi uvicorn[standard] python-jose[cryptography] passlib[bcrypt] python-dotenv
+
+
+__pycache__ : 성능을 높이기 위해 파이썬이 자동으로 생성하는 캐시 디렉토리
+
+__init__ : 해당 폴더가 파이썬 패키지라는 것을 인식시키기 위한 명시적 표현
