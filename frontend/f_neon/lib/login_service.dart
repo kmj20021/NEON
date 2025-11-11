@@ -8,7 +8,6 @@ import 'package:flutter/foundation.dart' show kIsWeb;
 import 'dart:io' show Platform;
 import 'package:flutter/foundation.dart' show kIsWeb;
 
-
 class LoginService {
   // 에뮬레이터 환경에 따라 조정
   // static String get baseUrl { //getter (속성처럼 보이는)함수
@@ -30,7 +29,6 @@ class LoginService {
     // iOS 시뮬레이터 또는 기타 플랫폼
     return 'http://localhost:8000';
   }
-
 
   final _storage = const FlutterSecureStorage();
   static const _kAccess = 'access_token';

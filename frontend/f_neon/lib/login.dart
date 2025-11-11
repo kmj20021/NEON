@@ -1,8 +1,69 @@
+import 'package:f_neon/Register.dart';
+import 'package:f_neon/login_service.dart';
 import 'package:flutter/material.dart';
 import 'package:f_neon/accept.dart';
 
-class LoginPage extends StatelessWidget {
+class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
+
+  @override
+  State<LoginPage> createState() => _LoginPageState();
+}
+
+class _LoginPageState extends State<LoginPage> {
+  final _svc = LoginService(); // 에뮬레이터에 따라 다른 URL 사용
+  final _idCtrl = TextEditingController(); // ID 입력 컨트롤러 (라이브러리)
+  final _pwCtrl = TextEditingController(); // 비밀번호 입력 컨트롤러 (라이브러리)
+  final _pw2Ctrl = TextEditingController(); // 비밀번호 확인 입력 컨트롤러 (라이브러리)
+  String? message;
+
+  // 로딩 상태, 메시지
+  bool _loading = false;
+  String? _msg;
+
+  // 회원가입 함수
+  Future<void> _doSignUp() async {
+    setState(() {
+      _msg = null;
+      _loading = true;
+    });
+
+    try {
+      final id = _idCtrl.text.trim(); // trim() 공백 제거
+      final pw = _pwCtrl.text;
+      final pw2 = _pw2Ctrl.text;
+
+      if (id.isEmpty) {
+        throw Exception('ID를 입력해 주세요.');
+      }
+      if (pw.isEmpty) {
+        throw Exception('비밀번호를 입력해 주세요.');
+      }
+      if (pw != pw2) {
+        throw Exception('비밀번호가 일치하지 않습니다.');
+      }
+
+      final msg = await _svc.signup(id, pw);
+
+      // 성공 시 메시지 표시 후 이전 화면으로 복귀
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
+      Navigator.pop(context, true); // 로그인 화면으로 복귀
+    } catch (e) {
+      setState(() => _msg = e.toString().replaceFirst('Exception: ', ''));
+    } finally {
+      setState(() => _loading = false);
+    }
+  }
+
+  // 리소스 해제 (자원 정리)
+  @override
+  void dispose() {
+    _idCtrl.dispose();
+    _pwCtrl.dispose();
+    _pw2Ctrl.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -58,6 +119,7 @@ class LoginPage extends StatelessWidget {
             width: 500,
             height: 50,
             child: TextField(
+              controller: _idCtrl,
               decoration: InputDecoration(
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
@@ -79,6 +141,7 @@ class LoginPage extends StatelessWidget {
             width: 500,
             height: 50,
             child: TextField(
+              controller: _pwCtrl,
               obscureText: true,
               decoration: InputDecoration(
                 border: OutlineInputBorder(
@@ -98,24 +161,21 @@ class LoginPage extends StatelessWidget {
       child: Column(
         children: [
           InkWell(
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => AcceptPage()),
-              );
-              print('로그인2');
-            },
+            onTap: _loading ? null : _doSignUp, // _loading이 true면 비활성화
             child: Container(
               width: 500,
               height: 50,
               decoration: BoxDecoration(
-                color: Color.fromARGB(255, 255, 87, 87),
+                color: _loading
+                    ? Colors
+                          .grey // 로딩 중일 때는 회색으로 표시
+                    : const Color.fromARGB(255, 255, 87, 87),
                 borderRadius: BorderRadius.circular(12),
               ),
               alignment: Alignment.center,
               child: Text(
-                '로그인',
-                style: TextStyle(
+                _loading ? '처리 중...' : '로그인',
+                style: const TextStyle(
                   color: Colors.white,
                   fontWeight: FontWeight.bold,
                 ),
@@ -132,7 +192,16 @@ class LoginPage extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Text('회원가입', style: TextStyle(color: Colors.grey)),
+          InkWell(
+            onTap: () {
+              print("회원가입 클릭!");
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => Register()),
+              );
+            },
+            child: Text('회원가입', style: TextStyle(color: Colors.grey)),
+          ),
           SizedBox(width: 16),
           Text('아이디/비밀번호 찾기', style: TextStyle(color: Colors.grey)),
         ],
