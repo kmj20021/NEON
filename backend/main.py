@@ -27,7 +27,7 @@ app.add_middleware(
     클라이언트가 보낸 데이터를 id가 str인지 pw가 str인지 검증하는 역할함. => 일치하지 않을 시 422 에러 발생
 '''
 
-#로그인 요청용
+#로그인 요청 데이터 검증용
 class Login(BaseModel):
     id: str
     pw: str 
@@ -47,6 +47,14 @@ class RefreshIn(BaseModel):
 class TokenOut(BaseModel):
     access_token: str   # 재발급 했으니 토큰 발급
     token_type: str = "Bearer"
+
+#회원가입, 로그인 공통 데이터 검증용 (중복 코드 삭제)
+class SignUpIn(BaseModel):
+    id: str
+    pw: str
+
+class SignUpOut(BaseModel):
+    message: str
 
 def get_user(id : str) -> Optional[tuple] : #return 타입이 tuple or None
     conn = get_conn()   # DB 연결
@@ -120,3 +128,36 @@ def dev_hash_once(id: str, plain_pw:str):
     conn.commit()
     conn.close()
     return{"id":id, "pw_hash":hashed}
+
+#회원가입 요청 API
+@app.post("/signup", response_model=SignUpOut)
+def signup(body: SignUpIn) :
+    if not body.id or not body.id.strip() :
+        raise HTTPException(status_code=400, detail="Id는 비어 있을 수 없습니다.")
+    if not body.pw or not body.pw.strip() :
+        raise HTTPException(status_code=400, detail="비밀번호는 비어있을 수 없습니다.")
+    if len(body.id)>100 :
+        raise HTTPException(status_code=400, detail="ID의 길이가 너무 깁니다.")
+    if len(body.pw)<4 :
+        raise HTTPException(status_code=400, detail="비밀번호는 4자리 이상이어야 합니다.")
+    
+    # 아이디 중복 확인
+    if get_user(body.id) :
+        raise HTTPException(status_code=409, detail="이미 존재하는 아이디 입니다.")
+    
+    # 비밀번호 해시 후 저장
+    hashed = hash_password(body.pw)
+
+    conn = get_conn()
+    cur = conn.cursor()
+
+    try :
+        cur.execute(
+            "INSERT INTO user (id, pw_hash) VALUES (%s, %s)", (body.id, hashed)
+        )
+        conn.commit()
+    finally :
+        conn.close()
+
+    return {"message" : f"{body.id}님, 회원가입이 완료되었습니다."}
+    
