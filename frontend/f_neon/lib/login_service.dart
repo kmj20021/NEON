@@ -113,7 +113,7 @@ class LoginService {
     }
   }
 
-  /// 보호된 API 예시 (/me)
+  // 보호된 API 예시 (/me)
   Future<Map<String, dynamic>> fetchMe() async {
     final headers = {
       'Content-Type': 'application/json',
