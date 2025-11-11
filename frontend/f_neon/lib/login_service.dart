@@ -6,21 +6,31 @@ import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 // 모바일/데스크톱에서만 사용
 import 'dart:io' show Platform;
+import 'package:flutter/foundation.dart' show kIsWeb;
+
 
 class LoginService {
-  // 환경별 기본 URL
+  // 에뮬레이터 환경에 따라 조정
+  // static String get baseUrl { //getter (속성처럼 보이는)함수
+  //   if (Platform.isAndroid) return 'http://10.0.2.2:8000'; // Android Emulator → host PC
+  //   return 'http://localhost:8000'; // PC, iOS Simulator
+  // }
+
   static String get baseUrl {
-    // 1) 웹은 Platform 접근 금지
     if (kIsWeb) {
+      // 웹에서는 localhost 기준
       return 'http://localhost:8000';
     }
-    // 2) 모바일/데스크톱만 Platform 접근
+
     if (Platform.isAndroid) {
-      return 'http://10.0.2.2:8000'; // Android Emulator → Host PC
+      // Android 에뮬레이터에서는 10.0.2.2가 host PC를 가리킴
+      return 'http://10.0.2.2:8000';
     }
-    // iOS 시뮬레이터/데스크톱
+
+    // iOS 시뮬레이터 또는 기타 플랫폼
     return 'http://localhost:8000';
   }
+
 
   final _storage = const FlutterSecureStorage();
   static const _kAccess = 'access_token';
@@ -68,7 +78,7 @@ class LoginService {
     await _storage.delete(key: _kRefresh);
   }
 
-  /// 인증 헤더 생성
+  // 인증 헤더 생성
   Future<Map<String, String>> _authHeader() async {
     String? access = await _storage.read(key: _kAccess);
     if (access == null) return {};
@@ -80,7 +90,7 @@ class LoginService {
     return access != null ? {'Authorization': 'Bearer $access'} : {};
   }
 
-  /// Access 토큰 재발급
+  // Access 토큰 재발급
   Future<void> _refreshAccess() async {
     final refresh = await _storage.read(key: _kRefresh);
     if (refresh == null) {
