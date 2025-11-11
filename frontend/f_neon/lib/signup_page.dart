@@ -44,9 +44,10 @@ class _SignUpPageState extends State<SignUpPage> {
 
       final msg = await _svc.signup(id, pw);
 
-      // 성공 시 메시지 표시 후 이전 화면으로 복귀
+      // 이 위젯이 아직 화면에 없으면 아무것도 하지 말고 return
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
+      // mounted는 statefulWidget의 상태가 현재 위젯 트리에 존재하는지를 나타내는 내장 boolean변수
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg))); //사용자에게 메시지를 보여주는 방법
       Navigator.pop(context, true); // 로그인 화면으로 복귀
     } catch (e) {
       setState(() => _msg = e.toString().replaceFirst('Exception: ', ''));

@@ -56,10 +56,11 @@ class SignUpIn(BaseModel):
 class SignUpOut(BaseModel):
     message: str
 
+#유져 정보 조회 함수
 def get_user(id : str) -> Optional[tuple] : #return 타입이 tuple or None
     conn = get_conn()   # DB 연결
     cur = conn.cursor() # 커서 획득
-    cur.execute("SELECT id, pw_hash FROM user WHERE id = %s", (id,))  # 튜플로 전달
+    cur.execute("SELECT id, pw FROM user_t WHERE id = %s", (id,))  # 튜플로 전달
     row = cur.fetchone() # 결과가 여러개 일 땐 fetchall()
     conn.close()
     return row
@@ -124,10 +125,10 @@ def dev_hash_once(id: str, plain_pw:str):
     hashed = hash_password(plain_pw)
     conn = get_conn()
     cur = conn.cursor()
-    cur.execute("UPDATE \"user\" SET pw_hash = %s WHERE id = %s", (hashed, id))
+    cur.execute("UPDATE \"user\" SET pw = %s WHERE id = %s", (hashed, id))
     conn.commit()
     conn.close()
-    return{"id":id, "pw_hash":hashed}
+    return{"id":id, "pw":hashed}
 
 #회원가입 요청 API
 @app.post("/signup", response_model=SignUpOut)
@@ -153,7 +154,7 @@ def signup(body: SignUpIn) :
 
     try :
         cur.execute(
-            "INSERT INTO user (id, pw_hash) VALUES (%s, %s)", (body.id, hashed)
+            "INSERT INTO user_t (id, pw) VALUES (%s, %s)", (body.id, hashed)
         )
         conn.commit()
     finally :
