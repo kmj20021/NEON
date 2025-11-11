@@ -69,7 +69,7 @@ class SignUpOut(BaseModel):
 def get_user(id : str) -> Optional[tuple] : #return 타입이 tuple or None
     conn = get_conn()   # DB 연결
     cur = conn.cursor() # 커서 획득
-    cur.execute("SELECT id, pw FROM user_t WHERE id = %s", (id,))  # 튜플로 전달
+    cur.execute("SELECT id, hash_pw FROM user WHERE id = %s", (id,))  # 튜플로 전달
     row = cur.fetchone() # 결과가 여러개 일 땐 fetchall()
     conn.close()
     return row
@@ -162,7 +162,7 @@ def signup(body: SignUpIn) :
 
     try :
         cur.execute(
-            "INSERT INTO user (id, pw, name, email, phone) VALUES (%s, %s, %s, %s, %s)", (body.id, hashed, body.name, body.email, body.phone)
+            "INSERT INTO user (id, hash_pw, name, email, phone, address) VALUES (%s, %s, %s, %s, %s, %s)", (body.id, hashed, body.name, body.email, body.phone, "need address")
         )
         conn.commit()
     finally :
