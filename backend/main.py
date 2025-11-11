@@ -2,7 +2,7 @@ import os    # 운영체제 관련 기능
 from typing import Optional # 타입 힌트용
 from fastapi import FastAPI, HTTPException, Depends, Header
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
+from pydantic import BaseModel, field_validator
 from jose import JWTError, ExpiredSignatureError
 from db.config import get_conn # DB 연결 함수 가져오기
 from backend.auth import ( #내가 만든 함수들 가져오기
@@ -48,10 +48,19 @@ class TokenOut(BaseModel):
     access_token: str   # 재발급 했으니 토큰 발급
     token_type: str = "Bearer"
 
-#회원가입, 로그인 공통 데이터 검증용 (중복 코드 삭제)
+#회원가입 요청용
 class SignUpIn(BaseModel):
     id: str
     pw: str
+    name: str
+    email: str
+    phone: str
+
+    @field_validator('id', 'pw', 'name', 'email', 'phone')
+    def not_empty(cls, v, field) :
+        if not v or not str(v).strip() :
+            raise ValueError(f"{field.name}은/는 비어 있을 수 없습니다.")
+        return v
 
 class SignUpOut(BaseModel):
     message: str
@@ -132,15 +141,14 @@ def dev_hash_once(id: str, plain_pw:str):
 
 #회원가입 요청 API
 @app.post("/signup", response_model=SignUpOut)
-def signup(body: SignUpIn) :
-    if not body.id or not body.id.strip() :
-        raise HTTPException(status_code=400, detail="Id는 비어 있을 수 없습니다.")
-    if not body.pw or not body.pw.strip() :
-        raise HTTPException(status_code=400, detail="비밀번호는 비어있을 수 없습니다.")
+def signup(body: SignUpIn) :  
+
+    #입력값 검증    
     if len(body.id)>100 :
         raise HTTPException(status_code=400, detail="ID의 길이가 너무 깁니다.")
     if len(body.pw)<4 :
         raise HTTPException(status_code=400, detail="비밀번호는 4자리 이상이어야 합니다.")
+   
     
     # 아이디 중복 확인
     if get_user(body.id) :
@@ -154,7 +162,7 @@ def signup(body: SignUpIn) :
 
     try :
         cur.execute(
-            "INSERT INTO user_t (id, pw) VALUES (%s, %s)", (body.id, hashed)
+            "INSERT INTO user (id, pw, name, email, phone) VALUES (%s, %s, %s, %s, %s)", (body.id, hashed, body.name, body.email, body.phone)
         )
         conn.commit()
     finally :

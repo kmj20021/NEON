@@ -9,6 +9,8 @@ import 'dart:io' show Platform;
 import 'package:flutter/foundation.dart' show kIsWeb;
 
 
+
+
 class LoginService {
   // 에뮬레이터 환경에 따라 조정
   // static String get baseUrl { //getter (속성처럼 보이는)함수
