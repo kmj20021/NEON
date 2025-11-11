@@ -54,11 +54,23 @@ class LoginService {
   }
 
   /// 회원가입
-  Future<String> signup(String id, String pw) async {
+  Future<String> signup(
+    String id,
+    String pw,
+    String name,
+    String email,
+    String phone,
+  ) async {
     final res = await http.post(
       Uri.parse('$baseUrl/signup'),
       headers: {'Content-Type': 'application/json'},
-      body: jsonEncode({'id': id, 'pw': pw}),
+      body: jsonEncode({
+        'id': id,
+        'pw': pw,
+        'name': name,
+        'email': email,
+        'phone': phone,
+      }),
     );
 
     if (res.statusCode == 200) {

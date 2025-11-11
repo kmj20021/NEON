@@ -1,3 +1,4 @@
+import 'package:f_neon/login_service.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -9,31 +10,77 @@ class Register extends StatefulWidget {
   State<Register> createState() => _RegisterState();
 }
 
+final _svc = LoginService();
 final TextEditingController idController = TextEditingController();
 final TextEditingController pwController = TextEditingController();
 final TextEditingController pwCheckController = TextEditingController();
 final TextEditingController nameController = TextEditingController();
 final TextEditingController phoneController = TextEditingController();
+final TextEditingController emailController = TextEditingController();
+final TextEditingController allergenController = TextEditingController();
 
 class _RegisterState extends State<Register> {
-  void registerUser() async {
-    final response = await http.post(
-      Uri.parse('http://yourserver.com/api/register'),
-      headers: {'Content-Type': 'application/json'},
-      body: jsonEncode({
-        'username': idController.text,
-        'password': pwController.text,
-        'name': nameController.text,
-        'phone': phoneController.text,
-      }),
-    );
+  bool _loading = false;
+  String? _msg;
 
-    if (response.statusCode == 200) {
-      print('회원가입 성공: ${response.body}');
-    } else {
-      print('회원가입 실패: ${response.statusCode}');
-      print('에러 메시지: ${response.body}');
+  // 회원가입 함수
+  Future<void> _doSignUp() async {
+    setState(() {
+      _msg = null;
+      _loading = true;
+    });
+
+    try {
+      final id = idController.text.trim(); // trim() 공백 제거
+      final pw = pwController.text;
+      final pw2 = pwCheckController.text;
+      final name = nameController.text;
+      final email = emailController.text;
+      final phone = phoneController.text;
+
+      if (id.isEmpty) {
+        throw Exception('ID를 입력해 주세요.');
+      }
+      if (pw.isEmpty) {
+        throw Exception('비밀번호를 입력해 주세요.');
+      }
+      if (pw != pw2) {
+        throw Exception('비밀번호가 일치하지 않습니다.');
+      }
+      if (name.isEmpty) {
+        throw Exception('이름을 입력해 주세요.');
+      }
+      if (email.isEmpty) {
+        throw Exception('이메일을을 입력해 주세요.');
+      }
+      if (phone.isEmpty) {
+        throw Exception('전화 번호호를 입력해 주세요.');
+      }
+
+      final msg = await _svc.signup(id, pw, name, email, phone);
+
+      // 성공 시 메시지 표시 후 이전 화면으로 복귀
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
+      Navigator.pop(context, true); // 로그인 화면으로 복귀
+    } catch (e) {
+      setState(() => _msg = e.toString().replaceFirst('Exception: ', ''));
+    } finally {
+      setState(() => _loading = false);
     }
+  }
+
+  // 리소스 해제 (자원 정리)
+  @override
+  void dispose() {
+    idController.dispose();
+    pwController.dispose();
+    pwCheckController.dispose();
+    emailController.dispose();
+    allergenController.dispose();
+    nameController.dispose();
+
+    super.dispose();
   }
 
   @override
@@ -150,7 +197,7 @@ class _RegisterState extends State<Register> {
                       ),
                     ),
                   ),
-                  const SizedBox(width: 12),
+                  const SizedBox(width: 20),
                   SizedBox(
                     height: 50,
                     width: 100,
@@ -171,24 +218,40 @@ class _RegisterState extends State<Register> {
                   ),
                 ],
               ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: emailController,
+                decoration: InputDecoration(
+                  filled: true,
+                  fillColor: Colors.white,
+                  labelText: "이메일",
+                  border: OutlineInputBorder(),
+                ),
+              ),
+
               const SizedBox(height: 30),
+
               SizedBox(
                 width: double.infinity,
                 height: 50,
                 child: ElevatedButton(
-                  onPressed: () {
-                    registerUser();
-                    print("계정생성");
-                  },
+                  onPressed: _loading ? null : _doSignUp, // 로딩 중이면 비활성화
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color.fromARGB(255, 255, 87, 87),
-                    foregroundColor: Colors.white,
-                    textStyle: const TextStyle(fontSize: 12),
+                    backgroundColor: _loading
+                        ? Colors.grey
+                        : const Color.fromARGB(255, 255, 87, 87),
+                    minimumSize: Size(500, 50),
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
+                      borderRadius: BorderRadius.circular(12),
                     ),
                   ),
-                  child: const Text("계정 생성"),
+                  child: Text(
+                    _loading ? '처리 중...' : '회원가입',
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
                 ),
               ),
               const SizedBox(height: 30), // 하단 여백

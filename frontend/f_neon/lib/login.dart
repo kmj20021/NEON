@@ -22,7 +22,7 @@ class _LoginPageState extends State<LoginPage> {
   String? _msg;
 
   // 회원가입 함수
-  Future<void> _doSignUp() async {
+  Future<void> login() async {
     setState(() {
       _msg = null;
       _loading = true;
@@ -39,11 +39,8 @@ class _LoginPageState extends State<LoginPage> {
       if (pw.isEmpty) {
         throw Exception('비밀번호를 입력해 주세요.');
       }
-      if (pw != pw2) {
-        throw Exception('비밀번호가 일치하지 않습니다.');
-      }
 
-      final msg = await _svc.signup(id, pw);
+      final msg = await _svc.login(id, pw);
 
       // 성공 시 메시지 표시 후 이전 화면으로 복귀
       if (!mounted) return;
@@ -61,7 +58,6 @@ class _LoginPageState extends State<LoginPage> {
   void dispose() {
     _idCtrl.dispose();
     _pwCtrl.dispose();
-    _pw2Ctrl.dispose();
     super.dispose();
   }
 
@@ -78,7 +74,7 @@ class _LoginPageState extends State<LoginPage> {
           SizedBox(height: 10),
           pw(),
           SizedBox(height: 50),
-          login(context),
+          login1(context),
           SizedBox(height: 70),
           find(),
           SizedBox(height: 70),
@@ -156,12 +152,12 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  Widget login(BuildContext context) {
+  Widget login1(BuildContext context) {
     return Align(
       child: Column(
         children: [
           InkWell(
-            onTap: _loading ? null : _doSignUp, // _loading이 true면 비활성화
+            onTap: _loading ? null : login, // _loading이 true면 비활성화
             child: Container(
               width: 500,
               height: 50,

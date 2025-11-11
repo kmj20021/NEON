@@ -19,7 +19,6 @@ class _SignUpPageState extends State<SignUpPage> {
   bool _loading = false;
   String? _msg;
 
-
   // 회원가입 함수
   Future<void> _doSignUp() async {
     setState(() {
@@ -42,11 +41,11 @@ class _SignUpPageState extends State<SignUpPage> {
         throw Exception('비밀번호가 일치하지 않습니다.');
       }
 
-      final msg = await _svc.signup(id, pw);
+      // final msg = await _svc.signup(id, pw,);
 
       // 성공 시 메시지 표시 후 이전 화면으로 복귀
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
+      //ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
       Navigator.pop(context, true); // 로그인 화면으로 복귀
     } catch (e) {
       setState(() => _msg = e.toString().replaceFirst('Exception: ', ''));
@@ -75,19 +74,28 @@ class _SignUpPageState extends State<SignUpPage> {
           children: [
             TextField(
               controller: _idCtrl,
-              decoration: const InputDecoration(labelText: 'ID', border: OutlineInputBorder()),
+              decoration: const InputDecoration(
+                labelText: 'ID',
+                border: OutlineInputBorder(),
+              ),
             ),
             const SizedBox(height: 12),
             TextField(
               controller: _pwCtrl,
               obscureText: true,
-              decoration: const InputDecoration(labelText: '비밀번호', border: OutlineInputBorder()),
+              decoration: const InputDecoration(
+                labelText: '비밀번호',
+                border: OutlineInputBorder(),
+              ),
             ),
             const SizedBox(height: 12),
             TextField(
               controller: _pw2Ctrl,
               obscureText: true,
-              decoration: const InputDecoration(labelText: '비밀번호 확인', border: OutlineInputBorder()),
+              decoration: const InputDecoration(
+                labelText: '비밀번호 확인',
+                border: OutlineInputBorder(),
+              ),
             ),
             const SizedBox(height: 16),
             SizedBox(
@@ -98,7 +106,8 @@ class _SignUpPageState extends State<SignUpPage> {
               ),
             ),
             const SizedBox(height: 8),
-            if (_msg != null) Text(_msg!, style: const TextStyle(color: Colors.red)),
+            if (_msg != null)
+              Text(_msg!, style: const TextStyle(color: Colors.red)),
           ],
         ),
       ),
