@@ -43,7 +43,7 @@ class _LoginPageState extends State<LoginPage> {
         throw Exception('비밀번호가 일치하지 않습니다.');
       }
 
-      final msg = await _svc.signup(id, pw);
+      final msg = await _svc.login(id, pw);
 
       // 성공 시 메시지 표시 후 이전 화면으로 복귀
       if (!mounted) return;

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'login_service.dart';
 
 class Register extends StatefulWidget {
   const Register({Key? key}) : super(key: key);
@@ -9,33 +10,74 @@ class Register extends StatefulWidget {
   State<Register> createState() => _RegisterState();
 }
 
-final TextEditingController idController = TextEditingController();
-final TextEditingController pwController = TextEditingController();
-final TextEditingController pwCheckController = TextEditingController();
-final TextEditingController nameController = TextEditingController();
-final TextEditingController phoneController = TextEditingController();
-
 class _RegisterState extends State<Register> {
-  void registerUser() async {
-    final response = await http.post(
-      Uri.parse('http://yourserver.com/api/register'),
-      headers: {'Content-Type': 'application/json'},
-      body: jsonEncode({
-        'username': idController.text,
-        'password': pwController.text,
-        'name': nameController.text,
-        'phone': phoneController.text,
-      }),
-    );
+  final _svc = LoginService();
+  final _idController = TextEditingController();
+  final _pwController = TextEditingController();
+  final _pwCheckController = TextEditingController();
+  final _nameController = TextEditingController();
+  final _phoneController = TextEditingController();
+  final _emailController = TextEditingController();
 
-    if (response.statusCode == 200) {
-      print('회원가입 성공: ${response.body}');
-    } else {
-      print('회원가입 실패: ${response.statusCode}');
-      print('에러 메시지: ${response.body}');
+  String? _msg;
+
+  // 회원가입 함수
+  Future<void> _registerUser() async {
+    setState(() {
+      _msg = null;
+    });
+
+    try {
+      final id = _idController.text.trim();
+      final pw = _pwController.text;
+      final pw2 = _pwCheckController.text;
+      final name = _nameController.text.trim();
+      final email = _emailController.text.trim();
+      final phone = _phoneController.text.trim();
+      
+
+      if (id.isEmpty) {
+        throw Exception('ID를 입력해 주세요.');
+      }
+      if (pw.isEmpty) {
+        throw Exception('비밀번호를 입력해 주세요.');
+      }
+      if (pw != pw2) {
+        throw Exception('비밀번호가 일치하지 않습니다.');
+      }
+      if (name.isEmpty) {
+        throw Exception('이름을 입력해 주세요.');
+      }
+      if (email.isEmpty) {
+        throw Exception('이메일을 입력해 주세요.');
+      }
+      if (phone.isEmpty) {
+        throw Exception('휴대폰 번호를 입력해 주세요.');
+      }
+
+      final msg = await _svc.signup(id, pw, name, phone, email);
+
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
+      Navigator.pop(context, true);
+    } catch (e) {
+      setState(() => _msg = e.toString().replaceFirst('Exception: ', ''));
     }
-  }
+  }//회원가입 함수
 
+  @override
+  void dispose() {
+    _idController.dispose();
+    _pwController.dispose();
+    _pwCheckController.dispose();
+    _nameController.dispose();
+    _phoneController.dispose();
+    _emailController.dispose();
+    super.dispose();
+  }  
+
+
+  //UI 빌드
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -74,7 +116,7 @@ class _RegisterState extends State<Register> {
                   Expanded(
                     flex: 3,
                     child: TextField(
-                      controller: idController,
+                      controller: _idController,
                       decoration: const InputDecoration(
                         labelText: "아이디",
                         filled: true,
@@ -107,7 +149,7 @@ class _RegisterState extends State<Register> {
 
               const SizedBox(height: 20),
               TextField(
-                controller: pwController,
+                controller: _pwController,
                 decoration: const InputDecoration(
                   filled: true,
                   fillColor: Colors.white,
@@ -117,7 +159,7 @@ class _RegisterState extends State<Register> {
               ),
               const SizedBox(height: 20),
               TextField(
-                controller: pwCheckController,
+                controller: _pwCheckController,
                 decoration: const InputDecoration(
                   filled: true,
                   fillColor: Colors.white,
@@ -127,7 +169,7 @@ class _RegisterState extends State<Register> {
               ),
               const SizedBox(height: 20),
               TextField(
-                controller: nameController,
+                controller: _nameController,
                 decoration: const InputDecoration(
                   filled: true,
                   fillColor: Colors.white,
@@ -137,47 +179,60 @@ class _RegisterState extends State<Register> {
               ),
               const SizedBox(height: 20),
               Row(
-                children: [
-                  Expanded(
-                    flex: 3,
-                    child: TextField(
-                      controller: phoneController,
-                      decoration: const InputDecoration(
-                        filled: true,
-                        fillColor: Colors.white,
-                        labelText: "휴대폰 번호(010-)",
-                        border: OutlineInputBorder(),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  SizedBox(
-                    height: 50,
-                    width: 100,
-                    child: ElevatedButton(
-                      onPressed: () {
-                        print("휴대번호");
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color.fromARGB(255, 255, 87, 87),
-                        foregroundColor: Colors.white,
-                        textStyle: const TextStyle(fontSize: 12),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                      ),
-                      child: const Text("인증요청", maxLines: 1),
-                    ),
-                  ),
-                ],
-              ),
+  children: [
+    Expanded(
+      flex: 3,
+      child: TextField(
+        controller: _phoneController,
+        decoration: const InputDecoration(
+          filled: true,
+          fillColor: Colors.white,
+          labelText: "휴대폰 번호(010-)",
+          border: OutlineInputBorder(),
+        ),
+      ),
+    ),
+    const SizedBox(width: 12),
+    Expanded(
+      flex: 3,
+      child: TextField(
+        controller: _emailController,
+        decoration: const InputDecoration(
+          filled: true,
+          fillColor: Colors.white,
+          labelText: "이메일",
+          border: OutlineInputBorder(),
+        ),
+      ),
+    ),
+    const SizedBox(width: 12),
+    SizedBox(
+      height: 50,
+      width: 100,
+      child: ElevatedButton(
+        onPressed: () {
+          print("휴대번호");
+        },
+        style: ElevatedButton.styleFrom(
+          backgroundColor: const Color.fromARGB(255, 255, 87, 87),
+          foregroundColor: Colors.white,
+          textStyle: const TextStyle(fontSize: 12),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8),
+          ),
+        ),
+        child: const Text("인증요청", maxLines: 1),
+      ),
+    ),
+  ],
+),
               const SizedBox(height: 30),
               SizedBox(
                 width: double.infinity,
                 height: 50,
                 child: ElevatedButton(
                   onPressed: () {
-                    registerUser();
+                    _registerUser();
                     print("계정생성");
                   },
                   style: ElevatedButton.styleFrom(
