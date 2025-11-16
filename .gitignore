@@ -15,3 +15,6 @@ __pycache__/
 # OS별 숨김 파일
 .DS_Store
 Thumbs.db
+
+# 구글 서비스 계정 키 파일
+google_service/drive_key.json
