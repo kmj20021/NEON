@@ -1,7 +1,7 @@
 import 'package:f_neon/Register.dart';
 import 'package:f_neon/login_service.dart';
 import 'package:flutter/material.dart';
-import 'package:f_neon/accept.dart';
+import 'package:f_neon/main_page.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -21,8 +21,8 @@ class _LoginPageState extends State<LoginPage> {
   bool _loading = false;
   String? _msg;
 
-  // 회원가입 함수
-  Future<void> _doSignUp() async {
+  // 로그인 함수
+  Future<void> _doLogin() async {
     setState(() {
       _msg = null;
       _loading = true;
@@ -48,7 +48,10 @@ class _LoginPageState extends State<LoginPage> {
       // 성공 시 메시지 표시 후 이전 화면으로 복귀
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
-      Navigator.pop(context, true); // 로그인 화면으로 복귀
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => MainScreen()),
+      ); // 로그인 화면으로 복귀
     } catch (e) {
       setState(() => _msg = e.toString().replaceFirst('Exception: ', ''));
     } finally {
@@ -161,7 +164,7 @@ class _LoginPageState extends State<LoginPage> {
       child: Column(
         children: [
           InkWell(
-            onTap: _loading ? null : _doSignUp, // _loading이 true면 비활성화
+            onTap: _loading ? null : _doLogin, // _loading이 true면 비활성화
             child: Container(
               width: 500,
               height: 50,
