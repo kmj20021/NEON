@@ -50,6 +50,7 @@ def create_refresh_token(user_id: str) -> str:
 def decode_token(token: str) -> dict:
     return jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM]) # 페이로드값만 나옴
 
+#토큰으로 id 추출 및 검증
 def require_access(token: str) -> str:
     """
     Access 토큰 검증. 성공 시 user_id(sub) 리턴.

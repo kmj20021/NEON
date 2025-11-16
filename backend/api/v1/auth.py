@@ -30,6 +30,7 @@ def login(data: Login):
         "token_type": "Bearer",
     }
 
+# 리프레시 토큰으로 액세스 토큰 재발급
 @router.post("/refresh", response_model=TokenOut)
 def refresh_token(body: RefreshIn):
     try:
@@ -46,4 +47,4 @@ def refresh_token(body: RefreshIn):
 
 @router.get("/me")
 def me(current_user_id: str = Depends(auth_dependency)):
-    return {"id": current_user_id, "roles": ["USER"]}
+    return {"id": current_user_id, "roles": ["USER"]} #역할이 여러개 있을 수 있어서 list로 전달 ["USER", "SUPLIER"]
