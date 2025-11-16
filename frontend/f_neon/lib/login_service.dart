@@ -37,7 +37,7 @@ class LoginService {
   /// 로그인
   Future<String> login(String id, String pw) async {
     final res = await http.post(
-      Uri.parse('$baseUrl/login'),
+      Uri.parse('$baseUrl/auth/login'),
       headers: {'Content-Type': 'application/json'},
       body: jsonEncode({'id': id, 'pw': pw}),
     );
@@ -58,20 +58,22 @@ class LoginService {
     String id,
     String pw,
     String name,
-    String email,
     String phone,
+    String email,
   ) async {
     final res = await http.post(
-      Uri.parse('$baseUrl/signup'),
+      Uri.parse('$baseUrl/users/signup'),
       headers: {'Content-Type': 'application/json'},
       body: jsonEncode({
         'id': id,
         'pw': pw,
         'name': name,
-        'email': email,
         'phone': phone,
+        'email': email,
       }),
     );
+
+    print('id: $id, pw: $pw, name: $name, phone: $phone, email: $email');
 
     if (res.statusCode == 200) {
       final json = jsonDecode(res.body);
@@ -108,7 +110,7 @@ class LoginService {
     }
 
     final res = await http.post(
-      Uri.parse('$baseUrl/refresh'),
+      Uri.parse('$baseUrl/auth/refresh'),
       headers: {'Content-Type': 'application/json'},
       body: jsonEncode({'refresh_token': refresh}),
     );
@@ -130,7 +132,7 @@ class LoginService {
       ...await _authHeader(),
     };
 
-    var res = await http.get(Uri.parse('$baseUrl/me'), headers: headers);
+    var res = await http.get(Uri.parse('$baseUrl/auth/me'), headers: headers);
     if (res.statusCode == 200) {
       return jsonDecode(res.body);
     }
@@ -142,7 +144,7 @@ class LoginService {
         'Content-Type': 'application/json',
         ...await _authHeader(),
       };
-      res = await http.get(Uri.parse('$baseUrl/me'), headers: headers2);
+      res = await http.get(Uri.parse('$baseUrl/auth/me'), headers: headers2);
       if (res.statusCode == 200) {
         return jsonDecode(res.body);
       }

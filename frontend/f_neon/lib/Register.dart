@@ -1,7 +1,7 @@
-import 'package:f_neon/login_service.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'login_service.dart';
 
 class Register extends StatefulWidget {
   const Register({Key? key}) : super(key: key);
@@ -10,33 +10,30 @@ class Register extends StatefulWidget {
   State<Register> createState() => _RegisterState();
 }
 
-final _svc = LoginService();
-final TextEditingController idController = TextEditingController();
-final TextEditingController pwController = TextEditingController();
-final TextEditingController pwCheckController = TextEditingController();
-final TextEditingController nameController = TextEditingController();
-final TextEditingController phoneController = TextEditingController();
-final TextEditingController emailController = TextEditingController();
-final TextEditingController allergenController = TextEditingController();
-
 class _RegisterState extends State<Register> {
-  bool _loading = false;
+  final _svc = LoginService();
+  final _idController = TextEditingController();
+  final _pwController = TextEditingController();
+  final _pwCheckController = TextEditingController();
+  final _nameController = TextEditingController();
+  final _phoneController = TextEditingController();
+  final _emailController = TextEditingController();
+
   String? _msg;
 
   // 회원가입 함수
-  Future<void> _doSignUp() async {
+  Future<void> _registerUser() async {
     setState(() {
       _msg = null;
-      _loading = true;
     });
 
     try {
-      final id = idController.text.trim(); // trim() 공백 제거
-      final pw = pwController.text;
-      final pw2 = pwCheckController.text;
-      final name = nameController.text;
-      final email = emailController.text;
-      final phone = phoneController.text;
+      final id = _idController.text.trim();
+      final pw = _pwController.text;
+      final pw2 = _pwCheckController.text;
+      final name = _nameController.text.trim();
+      final email = _emailController.text.trim();
+      final phone = _phoneController.text.trim();
 
       if (id.isEmpty) {
         throw Exception('ID를 입력해 주세요.');
@@ -51,38 +48,34 @@ class _RegisterState extends State<Register> {
         throw Exception('이름을 입력해 주세요.');
       }
       if (email.isEmpty) {
-        throw Exception('이메일을을 입력해 주세요.');
+        throw Exception('이메일을 입력해 주세요.');
       }
       if (phone.isEmpty) {
-        throw Exception('전화 번호호를 입력해 주세요.');
+        throw Exception('휴대폰 번호를 입력해 주세요.');
       }
 
-      final msg = await _svc.signup(id, pw, name, email, phone);
+      final msg = await _svc.signup(id, pw, name, phone, email);
 
-      // 성공 시 메시지 표시 후 이전 화면으로 복귀
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
-      Navigator.pop(context, true); // 로그인 화면으로 복귀
+      Navigator.pop(context, true);
     } catch (e) {
       setState(() => _msg = e.toString().replaceFirst('Exception: ', ''));
-    } finally {
-      setState(() => _loading = false);
     }
-  }
+  } //회원가입 함수
 
-  // 리소스 해제 (자원 정리)
   @override
   void dispose() {
-    idController.dispose();
-    pwController.dispose();
-    pwCheckController.dispose();
-    emailController.dispose();
-    allergenController.dispose();
-    nameController.dispose();
-
+    _idController.dispose();
+    _pwController.dispose();
+    _pwCheckController.dispose();
+    _nameController.dispose();
+    _phoneController.dispose();
+    _emailController.dispose();
     super.dispose();
   }
 
+  //UI 빌드
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -121,7 +114,7 @@ class _RegisterState extends State<Register> {
                   Expanded(
                     flex: 3,
                     child: TextField(
-                      controller: idController,
+                      controller: _idController,
                       decoration: const InputDecoration(
                         labelText: "아이디",
                         filled: true,
@@ -154,7 +147,7 @@ class _RegisterState extends State<Register> {
 
               const SizedBox(height: 20),
               TextField(
-                controller: pwController,
+                controller: _pwController,
                 decoration: const InputDecoration(
                   filled: true,
                   fillColor: Colors.white,
@@ -164,7 +157,7 @@ class _RegisterState extends State<Register> {
               ),
               const SizedBox(height: 20),
               TextField(
-                controller: pwCheckController,
+                controller: _pwCheckController,
                 decoration: const InputDecoration(
                   filled: true,
                   fillColor: Colors.white,
@@ -174,7 +167,7 @@ class _RegisterState extends State<Register> {
               ),
               const SizedBox(height: 20),
               TextField(
-                controller: nameController,
+                controller: _nameController,
                 decoration: const InputDecoration(
                   filled: true,
                   fillColor: Colors.white,
@@ -188,7 +181,7 @@ class _RegisterState extends State<Register> {
                   Expanded(
                     flex: 3,
                     child: TextField(
-                      controller: phoneController,
+                      controller: _phoneController,
                       decoration: const InputDecoration(
                         filled: true,
                         fillColor: Colors.white,
@@ -197,7 +190,20 @@ class _RegisterState extends State<Register> {
                       ),
                     ),
                   ),
-                  const SizedBox(width: 20),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    flex: 3,
+                    child: TextField(
+                      controller: _emailController,
+                      decoration: const InputDecoration(
+                        filled: true,
+                        fillColor: Colors.white,
+                        labelText: "이메일",
+                        border: OutlineInputBorder(),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
                   SizedBox(
                     height: 50,
                     width: 100,
@@ -218,40 +224,24 @@ class _RegisterState extends State<Register> {
                   ),
                 ],
               ),
-              const SizedBox(height: 12),
-              TextField(
-                controller: emailController,
-                decoration: InputDecoration(
-                  filled: true,
-                  fillColor: Colors.white,
-                  labelText: "이메일",
-                  border: OutlineInputBorder(),
-                ),
-              ),
-
               const SizedBox(height: 30),
-
               SizedBox(
                 width: double.infinity,
                 height: 50,
                 child: ElevatedButton(
-                  onPressed: _loading ? null : _doSignUp, // 로딩 중이면 비활성화
+                  onPressed: () {
+                    _registerUser();
+                    print("계정생성");
+                  },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: _loading
-                        ? Colors.grey
-                        : const Color.fromARGB(255, 255, 87, 87),
-                    minimumSize: Size(500, 50),
+                    backgroundColor: const Color.fromARGB(255, 255, 87, 87),
+                    foregroundColor: Colors.white,
+                    textStyle: const TextStyle(fontSize: 12),
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(8),
                     ),
                   ),
-                  child: Text(
-                    _loading ? '처리 중...' : '회원가입',
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
+                  child: const Text("계정 생성"),
                 ),
               ),
               const SizedBox(height: 30), // 하단 여백
