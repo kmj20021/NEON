@@ -60,6 +60,7 @@ class LoginService {
     String name,
     String phone,
     String email,
+    String adress,
   ) async {
     final res = await http.post(
       Uri.parse('$baseUrl/users/signup'),
@@ -70,10 +71,13 @@ class LoginService {
         'name': name,
         'phone': phone,
         'email': email,
+        'adress': adress,
       }),
     );
 
-    print('id: $id, pw: $pw, name: $name, phone: $phone, email: $email');
+    print(
+      'id: $id, pw: $pw, name: $name, phone: $phone, email: $email,adress : $adress',
+    );
 
     if (res.statusCode == 200) {
       final json = jsonDecode(res.body);

@@ -18,6 +18,7 @@ class _RegisterState extends State<Register> {
   final _nameController = TextEditingController();
   final _phoneController = TextEditingController();
   final _emailController = TextEditingController();
+  final _adressController = TextEditingController();
 
   String? _msg;
 
@@ -34,6 +35,7 @@ class _RegisterState extends State<Register> {
       final name = _nameController.text.trim();
       final email = _emailController.text.trim();
       final phone = _phoneController.text.trim();
+      final adress = _adressController.text.trim();
 
       if (id.isEmpty) {
         throw Exception('ID를 입력해 주세요.');
@@ -53,8 +55,11 @@ class _RegisterState extends State<Register> {
       if (phone.isEmpty) {
         throw Exception('휴대폰 번호를 입력해 주세요.');
       }
+      if (adress.isEmpty) {
+        throw Exception('주소를 입력해 주세요.');
+      }
 
-      final msg = await _svc.signup(id, pw, name, phone, email);
+      final msg = await _svc.signup(id, pw, name, phone, email, adress);
 
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
@@ -72,6 +77,7 @@ class _RegisterState extends State<Register> {
     _nameController.dispose();
     _phoneController.dispose();
     _emailController.dispose();
+    _adressController.dispose();
     super.dispose();
   }
 
@@ -176,6 +182,7 @@ class _RegisterState extends State<Register> {
                 ),
               ),
               const SizedBox(height: 20),
+              // 📱 휴대폰 번호 + 인증요청 버튼 그대로 유지
               Row(
                 children: [
                   Expanded(
@@ -185,20 +192,7 @@ class _RegisterState extends State<Register> {
                       decoration: const InputDecoration(
                         filled: true,
                         fillColor: Colors.white,
-                        labelText: "휴대폰 번호(010-)",
-                        border: OutlineInputBorder(),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    flex: 3,
-                    child: TextField(
-                      controller: _emailController,
-                      decoration: const InputDecoration(
-                        filled: true,
-                        fillColor: Colors.white,
-                        labelText: "이메일",
+                        labelText: "휴대폰 번호 (010-xxxx-xxxx)",
                         border: OutlineInputBorder(),
                       ),
                     ),
@@ -209,7 +203,7 @@ class _RegisterState extends State<Register> {
                     width: 100,
                     child: ElevatedButton(
                       onPressed: () {
-                        print("휴대번호");
+                        print("휴대번호 인증요청");
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color.fromARGB(255, 255, 87, 87),
@@ -223,6 +217,29 @@ class _RegisterState extends State<Register> {
                     ),
                   ),
                 ],
+              ),
+
+              const SizedBox(height: 20),
+
+              // 📧 이메일 입력 필드 따로 아래로 이동
+              TextField(
+                controller: _emailController,
+                decoration: const InputDecoration(
+                  filled: true,
+                  fillColor: Colors.white,
+                  labelText: "이메일",
+                  border: OutlineInputBorder(),
+                ),
+              ),
+              const SizedBox(height: 20),
+              TextField(
+                controller: _adressController,
+                decoration: const InputDecoration(
+                  filled: true,
+                  fillColor: Colors.white,
+                  labelText: "주소",
+                  border: OutlineInputBorder(),
+                ),
               ),
               const SizedBox(height: 30),
               SizedBox(
