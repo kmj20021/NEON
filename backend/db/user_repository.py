@@ -2,6 +2,11 @@
 from typing import Optional, Tuple
 from DB.config import get_conn
 
+'''
+    데이터를 가져올 땐 fetchone, fetchall을 사용
+    데이터를 삽입, 수정, 삭제할 땐 execute 후 commit을 사용
+'''
+
 # 사용자 정보 조회 DAO 함수
 def get_user(id: str) -> Optional[tuple]:
     conn = get_conn()

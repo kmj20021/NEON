@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'my_page_screen.dart';  // ← 반드시 추가!!
 
 class MainScreen extends StatelessWidget {
   const MainScreen({super.key});
@@ -32,14 +33,23 @@ class MainScreen extends StatelessWidget {
         actions: [
           Padding(
             padding: const EdgeInsets.only(right: 16),
-            child: Icon(Icons.notifications_none, color: Colors.black),
+            child: GestureDetector(
+              onTap: () {
+                // 👉 MyPageScreen 으로 이동하는 부분
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => MyPageScreen()),
+                );
+              },
+              child: Icon(Icons.notifications_none, color: Colors.black),
+            ),
           ),
         ],
       ),
       body: Container(
         width: double.infinity,
         height: 300,
-        color: Colors.white, // 전체 배경 흰색
+        color: Colors.white,
         padding: const EdgeInsets.all(16),
         child: Center(
           child: Container(
@@ -52,7 +62,6 @@ class MainScreen extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // 아이콘 + 텍스트 줄
                 Row(
                   children: [
                     Icon(Icons.trending_up, color: Colors.redAccent),
@@ -68,8 +77,6 @@ class MainScreen extends StatelessWidget {
                   ],
                 ),
                 SizedBox(height: 7),
-
-                // 추가 내용 넣을 부분
                 Row(
                   children: [
                     Icon(
@@ -89,9 +96,8 @@ class MainScreen extends StatelessWidget {
                   ],
                 ),
                 SizedBox(height: 30),
-
                 Row(
-                  crossAxisAlignment: CrossAxisAlignment.start, // 핵심 포인트
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     ClipRRect(
                       borderRadius: BorderRadius.circular(16),

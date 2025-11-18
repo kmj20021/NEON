@@ -29,3 +29,8 @@ pw kmjkmj
 401 : 토큰 에러
 400 : 입력 형식 오류
 409 : 이미 존재하는 데이터
+
+토큰에 담긴 정보
+Header : 알고리즘, 토큰 타입
+Payload : 사용자 정보 (sub(id), type(access/refresh), iat(발급시간), exp(만료시간) )
+Signature : 비밀키와 알고리즘으로 개인마다 다른 시그니처를 갖음

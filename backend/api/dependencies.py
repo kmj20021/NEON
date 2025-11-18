@@ -21,4 +21,4 @@ def auth_dependency(
     except ExpiredSignatureError:
         raise HTTPException(status_code=401, detail="Access 만료")
     except JWTError:
-        raise HTTPException(status_code=401, detail="Access 토큰이 유효하지 않습니다.")
+        raise HTTPException(status_code=401, detail="Access 토큰에 문제가 있습니다.")

@@ -40,22 +40,36 @@ class LoginService {
 
   /// 로그인
   Future<String> login(String id, String pw) async {
-    final res = await http.post(
-      Uri.parse('$baseUrl/auth/login'),
-      headers: {'Content-Type': 'application/json'},
-      body: jsonEncode({'id': id, 'pw': pw}),
-    );
+  print('🔵 로그인 요청 보냄: $baseUrl/auth/login, id=$id');
 
-    if (res.statusCode == 200) {
+  final res = await http.post(
+    Uri.parse('$baseUrl/auth/login'),
+    headers: {'Content-Type': 'application/json'},
+    body: jsonEncode({'id': id, 'pw': pw}),
+  );
+
+  print('🟢 응답 코드: ${res.statusCode}');
+  print('🟢 응답 바디: ${res.body}');
+
+  if (res.statusCode == 200) {
+    try {
       final json = jsonDecode(res.body);
+      print('🟢 파싱된 JSON: $json');
+
       await _storage.write(key: _kAccess, value: json['access_token']);
       await _storage.write(key: _kRefresh, value: json['refresh_token']);
       return json['message'] ?? '로그인 성공';
-    } else {
-      final err = _safeErr(res.body);
-      throw Exception(err);
+    } catch (e, st) {
+      print('🔴 JSON 파싱 중 에러: $e');
+      print(st);
+      throw Exception('서버 응답 형식이 올바르지 않습니다.');
     }
+  } else {
+    final err = _safeErr(res.body);
+    print('🔴 에러 응답: $err');
+    throw Exception(err);
   }
+}
 
   /// 회원가입
   Future<String> signup(String id, String pw,String name, String phone, String email) async {
