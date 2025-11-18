@@ -8,9 +8,6 @@ import 'package:flutter/foundation.dart' show kIsWeb;
 import 'dart:io' show Platform;
 import 'package:flutter/foundation.dart' show kIsWeb;
 
-
-
-
 class LoginService {
   static const _pcIp = '192.168.226.139'; // 네 PC IP
   static const _useEmulator = false; // true면 에뮬레이터, false면 실기기
@@ -35,43 +32,42 @@ class LoginService {
     return 'http://$_pcIp:8000';
   }
 
-
   final _storage = const FlutterSecureStorage();
   static const _kAccess = 'access_token';
   static const _kRefresh = 'refresh_token';
 
   /// 로그인
   Future<String> login(String id, String pw) async {
-  print('🔵 로그인 요청 보냄: $baseUrl/auth/login, id=$id');
+    print('🔵 로그인 요청 보냄: $baseUrl/auth/login, id=$id');
 
-  final res = await http.post(
-    Uri.parse('$baseUrl/auth/login'),
-    headers: {'Content-Type': 'application/json'},
-    body: jsonEncode({'id': id, 'pw': pw}),
-  );
+    final res = await http.post(
+      Uri.parse('$baseUrl/auth/login'),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({'id': id, 'pw': pw}),
+    );
 
-  print('🟢 응답 코드: ${res.statusCode}');
-  print('🟢 응답 바디: ${res.body}');
+    print('🟢 응답 코드: ${res.statusCode}');
+    print('🟢 응답 바디: ${res.body}');
 
-  if (res.statusCode == 200) {
-    try {
-      final json = jsonDecode(res.body);
-      print('🟢 파싱된 JSON: $json');
+    if (res.statusCode == 200) {
+      try {
+        final json = jsonDecode(res.body);
+        print('🟢 파싱된 JSON: $json');
 
-      await _storage.write(key: _kAccess, value: json['access_token']);
-      await _storage.write(key: _kRefresh, value: json['refresh_token']);
-      return json['message'] ?? '로그인 성공';
-    } catch (e, st) {
-      print('🔴 JSON 파싱 중 에러: $e');
-      print(st);
-      throw Exception('서버 응답 형식이 올바르지 않습니다.');
+        await _storage.write(key: _kAccess, value: json['access_token']);
+        await _storage.write(key: _kRefresh, value: json['refresh_token']);
+        return json['message'] ?? '로그인 성공';
+      } catch (e, st) {
+        print('🔴 JSON 파싱 중 에러: $e');
+        print(st);
+        throw Exception('서버 응답 형식이 올바르지 않습니다.');
+      }
+    } else {
+      final err = _safeErr(res.body);
+      print('🔴 에러 응답: $err');
+      throw Exception(err);
     }
-  } else {
-    final err = _safeErr(res.body);
-    print('🔴 에러 응답: $err');
-    throw Exception(err);
   }
-}
 
   /// 회원가입
 Future<String> signup(
@@ -80,10 +76,12 @@ Future<String> signup(
   String name,
   String phone,
   String email,
+  String address,
+  
 ) async {
   print('🟣 baseUrl: $baseUrl');
   print('🟣 회원가입 요청: $baseUrl/users/signup');
-  print('🟣 보낸 데이터: id=$id, pw=$pw, name=$name, phone=$phone, email=$email');
+  print('🟣 보낸 데이터: id=$id, pw=$pw, name=$name, phone=$phone, email=$email address=$address');
 
   try {
     final res = await http.post(
@@ -95,6 +93,7 @@ Future<String> signup(
         'name': name,
         'phone': phone,
         'email': email,
+        'address': address,
       }),
     );
 

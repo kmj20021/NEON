@@ -19,6 +19,6 @@ def signup(body: SignUpIn):
 
     hashed = hash_password(body.pw)
 
-    create_user(body.id, hashed, body.name, body.email, body.phone)
+    create_user(body.id, hashed, body.name, body.email, body.phone, body.address)
 
     return {"message": f"{body.name}님, 회원가입이 완료되었습니다."}

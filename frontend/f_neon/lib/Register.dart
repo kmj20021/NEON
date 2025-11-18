@@ -18,6 +18,7 @@ class _RegisterState extends State<Register> {
   final _nameController = TextEditingController();
   final _phoneController = TextEditingController();
   final _emailController = TextEditingController();
+  final _addressController = TextEditingController();
 
   String? _msg;
 
@@ -34,7 +35,7 @@ class _RegisterState extends State<Register> {
       final name = _nameController.text.trim();
       final email = _emailController.text.trim();
       final phone = _phoneController.text.trim();
-      
+      final address = _addressController.text.trim();
 
       if (id.isEmpty) {
         throw Exception('ID를 입력해 주세요.');
@@ -54,8 +55,11 @@ class _RegisterState extends State<Register> {
       if (phone.isEmpty) {
         throw Exception('휴대폰 번호를 입력해 주세요.');
       }
+      if (address.isEmpty) {
+        throw Exception('주소소를 입력해 주세요.');
+      }
 
-      final msg = await _svc.signup(id, pw, name, phone, email);
+      final msg = await _svc.signup(id, pw, name, phone, email, address);
 
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
@@ -63,7 +67,7 @@ class _RegisterState extends State<Register> {
     } catch (e) {
       setState(() => _msg = e.toString().replaceFirst('Exception: ', ''));
     }
-  }//회원가입 함수
+  } //회원가입 함수
 
   @override
   void dispose() {
@@ -74,8 +78,7 @@ class _RegisterState extends State<Register> {
     _phoneController.dispose();
     _emailController.dispose();
     super.dispose();
-  }  
-
+  }
 
   //UI 빌드
   @override
@@ -178,54 +181,71 @@ class _RegisterState extends State<Register> {
                 ),
               ),
               const SizedBox(height: 20),
-              Row(
-  children: [
-    Expanded(
-      flex: 3,
-      child: TextField(
-        controller: _phoneController,
-        decoration: const InputDecoration(
-          filled: true,
-          fillColor: Colors.white,
-          labelText: "휴대폰 번호(010-)",
-          border: OutlineInputBorder(),
-        ),
-      ),
-    ),
-    const SizedBox(width: 12),
-    Expanded(
-      flex: 3,
-      child: TextField(
-        controller: _emailController,
-        decoration: const InputDecoration(
-          filled: true,
-          fillColor: Colors.white,
-          labelText: "이메일",
-          border: OutlineInputBorder(),
-        ),
-      ),
-    ),
-    const SizedBox(width: 12),
-    SizedBox(
-      height: 50,
-      width: 100,
-      child: ElevatedButton(
-        onPressed: () {
-          print("휴대번호");
-        },
-        style: ElevatedButton.styleFrom(
-          backgroundColor: const Color.fromARGB(255, 255, 87, 87),
-          foregroundColor: Colors.white,
-          textStyle: const TextStyle(fontSize: 12),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8),
-          ),
-        ),
-        child: const Text("인증요청", maxLines: 1),
-      ),
-    ),
-  ],
-),
+
+              Column(
+                children: [
+                  Row(
+                    children: [
+                      Expanded(
+                        child: TextField(
+                          controller: _phoneController,
+                          decoration: const InputDecoration(
+                            filled: true,
+                            fillColor: Colors.white,
+                            labelText: "휴대폰 번호(010-)",
+                            border: OutlineInputBorder(),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      SizedBox(
+                        height: 50,
+                        width: 100,
+                        child: ElevatedButton(
+                          onPressed: () {
+                            print("휴대번호");
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Color.fromARGB(255, 255, 87, 87),
+                            foregroundColor: Colors.white,
+                            textStyle: const TextStyle(fontSize: 12),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                          ),
+                          child: const Text("인증요청", maxLines: 1),
+                        ),
+                      ),
+                    ],
+                  ),
+
+                  const SizedBox(height: 20),
+
+                  TextField(
+                    controller: _emailController,
+                    decoration: const InputDecoration(
+                      filled: true,
+                      fillColor: Colors.white,
+                      labelText: "이메일",
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+
+                  const SizedBox(height: 20),
+
+                  TextField(
+                    controller: _addressController,
+                    decoration: const InputDecoration(
+                      filled: true,
+                      fillColor: Colors.white,
+                      labelText: "주소",
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+
+                  const SizedBox(height: 20),
+                ],
+              ),
               const SizedBox(height: 30),
               SizedBox(
                 width: double.infinity,

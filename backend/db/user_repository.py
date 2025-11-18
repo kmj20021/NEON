@@ -17,7 +17,7 @@ def get_user(id: str) -> Optional[tuple]:
     return row
 
 # 사용자 생성 DAO 함수
-def create_user(id: str, hashed_pw: str, name: str, email: str, phone: str, address: str = "need address"):
+def create_user(id: str, hashed_pw: str, name: str, email: str, phone: str, address: str):
     conn = get_conn()
     cur = conn.cursor()
     try:
