@@ -9,25 +9,27 @@ import 'dart:io' show Platform;
 import 'package:flutter/foundation.dart' show kIsWeb;
 
 class LoginService {
-  // 에뮬레이터 환경에 따라 조정
-  // static String get baseUrl { //getter (속성처럼 보이는)함수
-  //   if (Platform.isAndroid) return 'http://10.0.2.2:8000'; // Android Emulator → host PC
-  //   return 'http://localhost:8000'; // PC, iOS Simulator
-  // }
-
+  static const _pcIp = '192.168.226.139'; // 네 PC IP
+  static const _useEmulator = false; // true면 에뮬레이터, false면 실기기
+    
   static String get baseUrl {
+    // 웹일 때
     if (kIsWeb) {
-      // 웹에서는 localhost 기준
       return 'http://localhost:8000';
     }
 
+    // 안드로이드일 때
     if (Platform.isAndroid) {
-      // Android 에뮬레이터에서는 10.0.2.2가 host PC를 가리킴
-      return 'http://10.0.2.2:8000';
+      if (_useEmulator) {
+        return 'http://10.0.2.2:8000';
+      } else {
+        // 실기기
+        return 'http://$_pcIp:8000';
+      }
     }
 
-    // iOS 시뮬레이터 또는 기타 플랫폼
-    return 'http://localhost:8000';
+    // iOS, 기타
+    return 'http://$_pcIp:8000';
   }
 
   final _storage = const FlutterSecureStorage();
@@ -68,14 +70,20 @@ class LoginService {
   }
 
   /// 회원가입
-  Future<String> signup(
-    String id,
-    String pw,
-    String name,
-    String phone,
-    String email,
-    String address,
-  ) async {
+Future<String> signup(
+  String id,
+  String pw,
+  String name,
+  String phone,
+  String email,
+  String address,
+  
+) async {
+  print('🟣 baseUrl: $baseUrl');
+  print('🟣 회원가입 요청: $baseUrl/users/signup');
+  print('🟣 보낸 데이터: id=$id, pw=$pw, name=$name, phone=$phone, email=$email address=$address');
+
+  try {
     final res = await http.post(
       Uri.parse('$baseUrl/users/signup'),
       headers: {'Content-Type': 'application/json'},
@@ -89,16 +97,32 @@ class LoginService {
       }),
     );
 
-    print('id: $id, pw: $pw, name: $name, phone: $phone, email: $email');
+    print('🟣 응답 코드: ${res.statusCode}');
+    print('🟣 응답 바디: ${res.body}');
 
     if (res.statusCode == 200) {
-      final json = jsonDecode(res.body);
-      return json['message']?.toString() ?? '회원가입 완료';
+      try {
+        final json = jsonDecode(res.body);
+        print('🟣 파싱된 JSON: $json');
+
+        return json['message']?.toString() ?? '회원가입 완료';
+      } catch (e, st) {
+        print('🔴 JSON 파싱 중 에러: $e');
+        print(st);
+        throw Exception('서버 응답 형식 오류(JSON 파싱 실패)');
+      }
     } else {
       final err = _safeErr(res.body);
+      print('🔴 회원가입 실패: $err');
       throw Exception(err);
     }
+
+  } catch (e, st) {
+    print('🔴 signup http.post 에러: $e');
+    print(st);
+    throw Exception('네트워크 오류: 서버에 연결할 수 없습니다.');
   }
+}
 
   /// 로그아웃
   Future<void> logout() async {

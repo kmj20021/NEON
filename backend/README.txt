@@ -1,6 +1,9 @@
 //만약 서버를 열어서 DB를 갔다오고 싶으면 다음 코드를 터미널에서 실행시키세요.
 uvicorn backend.main:app --reload --host 127.0.0.1 --port 8000
 
+//핸드폰에서 실행 시
+uvicorn backend.main:app --reload --host 0.0.0.0 --port 8000  
+
 
 
 ***
