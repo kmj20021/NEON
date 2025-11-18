@@ -21,43 +21,46 @@ class _LoginPageState extends State<LoginPage> {
   bool _loading = false;
   String? _msg;
 
-  // 로그인 함수
-  Future<void> _doLogin() async {
-    setState(() {
-      _msg = null;
-      _loading = true;
-    });
+Future<void> _doLogin() async {
+  setState(() {
+    _msg = null;
+    _loading = true;
+  });
 
-    try {
-      final id = _idCtrl.text.trim(); // trim() 공백 제거
-      final pw = _pwCtrl.text;
-      final pw2 = _pw2Ctrl.text;
+  try {
+    final id = _idCtrl.text.trim();
+    final pw = _pwCtrl.text;
 
-      if (id.isEmpty) {
-        throw Exception('ID를 입력해 주세요.');
-      }
-      if (pw.isEmpty) {
-        throw Exception('비밀번호를 입력해 주세요.');
-      }
-      if (pw != pw2) {
-        throw Exception('비밀번호가 일치하지 않습니다.');
-      }
+    print('1️⃣ 입력값: id=$id, pw=$pw');
 
-      final msg = await _svc.login(id, pw);
-
-      // 성공 시 메시지 표시 후 이전 화면으로 복귀
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => MainScreen()),
-      ); // 로그인 화면으로 복귀
-    } catch (e) {
-      setState(() => _msg = e.toString().replaceFirst('Exception: ', ''));
-    } finally {
-      setState(() => _loading = false);
+    if (id.isEmpty) {
+      throw Exception('ID를 입력해 주세요.');
     }
+    if (pw.isEmpty) {
+      throw Exception('비밀번호를 입력해 주세요.');
+    }
+
+    print('2️⃣ _svc.login 호출 직전');
+    final msg = await _svc.login(id, pw);
+    print('3️⃣ _svc.login 응답: $msg');
+
+    if (!mounted) return;
+
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
+
+    print('4️⃣ Navigator.pushReplacement 호출');
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => MainScreen()),
+    );
+  } catch (e) {
+    print('⚠️ 에러 발생: $e');
+    setState(() => _msg = e.toString().replaceFirst('Exception: ', ''));
+  } finally {
+    setState(() => _loading = false);
   }
+}
+
 
   // 리소스 해제 (자원 정리)
   @override

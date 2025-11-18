@@ -1,15 +1,27 @@
 // lib/services/photo_service.dart
 
 import 'dart:convert';
-import 'dart:io';
-
+import 'dart:io' show Platform;              // 그대로 두되
+import 'package:flutter/foundation.dart';    // kIsWeb
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 
 class PhotoService {
   static String get baseUrl {
-    if (Platform.isAndroid) return 'http://10.0.2.2:8000'; // 에뮬레이터 → PC
+    // 🔹 웹(Chrome)일 때
+    if (kIsWeb) {
+      // 여기에는 실제 서버 주소로 바꿔도 됨
+      return 'http://localhost:8000';
+      // 예: return 'http://192.168.0.5:8000';
+    }
+
+    // 🔹 안드로이드 에뮬레이터일 때
+    if (Platform.isAndroid) {
+      return 'http://10.0.2.2:8000';
+    }
+
+    // 🔹 iOS 시뮬레이터 / 데스크탑 등
     return 'http://localhost:8000';
   }
 
