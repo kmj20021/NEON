@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'login.dart'; // LoginPage 클래스가 있는 파일 import
+
+import 'ai_main_screen.dart';
+
 void main() {
   runApp(const MyApp());
 }
@@ -12,7 +15,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Login Demo',
       theme: ThemeData(primarySwatch: Colors.red),
-      home: const LoginPage(), // 로그인 페이지를 앱 시작 화면으로 설정
+      home: const MainScreen(), // 로그인 페이지를 앱 시작 화면으로 설정
       debugShowCheckedModeBanner: false, // 상단 debug 배너 제거
     );
   }
