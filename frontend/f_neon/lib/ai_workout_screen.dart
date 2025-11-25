@@ -1,42 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'models/saved_routine.dart';
+import 'models/workout_data.dart';
 
-// 모델 클래스
-class SavedRoutine {
-  final String id;
-  final String name;
-  final List<int> workouts;
-  final DateTime createdAt;
-
-  SavedRoutine({
-    required this.id,
-    required this.name,
-    required this.workouts,
-    required this.createdAt,
-  });
-}
-
-class WorkoutData {
-  final int id;
-  final String name;
-  final String description;
-  final String bodyPart;
-  final String intensity;
-  final String image;
-  final String youtubeUrl;
-  final String detailDescription;
-
-  WorkoutData({
-    required this.id,
-    required this.name,
-    required this.description,
-    required this.bodyPart,
-    required this.intensity,
-    required this.image,
-    required this.youtubeUrl,
-    required this.detailDescription,
-  });
-}
 
 class WorkoutScreen extends StatefulWidget {
   // 페이지 이동 콜백 함수들
@@ -46,11 +12,11 @@ class WorkoutScreen extends StatefulWidget {
   final Function(List<int>) onStartWorkout;
 
   const WorkoutScreen({
-    Key? key,
-    required this.onBack,
-    required this.navigateToPage,
-    required this.onSaveRoutine,
-    required this.onStartWorkout,
+    Key? key, // 부모 위젯에서 키를 전달받기 위한 매개변수
+    required this.onBack, // 뒤로가기 콜백 함수
+    required this.navigateToPage, // 페이지 이동 콜백 함수
+    required this.onSaveRoutine, // 루틴 저장 콜백 함수
+    required this.onStartWorkout, // 운동 시작 콜백 함수
   }) : super(key: key);
 
   @override
@@ -61,14 +27,14 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
   // 상태 변수들
   String selectedCategory = '전체';
   String searchQuery = '';
-  List<int> selectedWorkouts = [];
-  WorkoutData? selectedWorkout;
-  bool showDetailModal = false;
-  String activeTab = '운동';
-  bool showSaveRoutineModal = false;
-  String routineName = '';
+  List<int> selectedWorkouts = []; // 선택된 운동 ID 목록
+  WorkoutData? selectedWorkout; //현재 선택된 운동 상세 정보
+  bool showDetailModal = false; // 운동 상세 모달 표시 여부
+  String activeTab = '운동'; // 하단 탭 중 어떤거 선택 되었는지
+  bool showSaveRoutineModal = false; //루틴 저장 모달 표시 여부
+  String routineName = ''; //루틴 이름 입력값
 
-  // 운동 데이터
+  // 운동 데이터 (연습용)
   final List<WorkoutData> workoutData = [
     WorkoutData(
       id: 1,
@@ -189,7 +155,7 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
     final newRoutine = SavedRoutine(
       id: DateTime.now().millisecondsSinceEpoch.toString(),
       name: routineName.trim(),
-      workouts: List.from(selectedWorkouts),
+      workoutIds: List<int>.from(selectedWorkouts),
       createdAt: DateTime.now(),
     );
 

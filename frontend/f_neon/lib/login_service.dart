@@ -202,4 +202,8 @@ Future<String> signup(
       return '요청 실패';
     }
   }
+
+  Future<Map<String,String>> getAuthHeader() async {
+    return await _authHeader();
+  }
 }
