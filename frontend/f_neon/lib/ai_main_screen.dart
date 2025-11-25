@@ -111,18 +111,21 @@ class _MainScreenState extends State<MainScreen> {
     // 3주간 표시 (21일)
     for (int i = 0; i < 21; i++) {
       final isCurrentMonth = currentDate.month == currentMonth;
-      final isToday = currentDate.year == today.year &&
+      final isToday =
+          currentDate.year == today.year &&
           currentDate.month == today.month &&
           currentDate.day == today.day;
       final hasWorkout = DateTime.now().millisecond % 2 == 0; // 임의의 운동 기록
 
-      days.add(CalendarDay(
-        date: currentDate,
-        day: currentDate.day,
-        isCurrentMonth: isCurrentMonth,
-        isToday: isToday,
-        hasWorkout: isCurrentMonth && hasWorkout,
-      ));
+      days.add(
+        CalendarDay(
+          date: currentDate,
+          day: currentDate.day,
+          isCurrentMonth: isCurrentMonth,
+          isToday: isToday,
+          hasWorkout: isCurrentMonth && hasWorkout,
+        ),
+      );
 
       currentDate = currentDate.add(const Duration(days: 1));
     }
@@ -134,8 +137,18 @@ class _MainScreenState extends State<MainScreen> {
   Widget build(BuildContext context) {
     final today = DateTime.now();
     final monthNames = [
-      '1월', '2월', '3월', '4월', '5월', '6월',
-      '7월', '8월', '9월', '10월', '11월', '12월'
+      '1월',
+      '2월',
+      '3월',
+      '4월',
+      '5월',
+      '6월',
+      '7월',
+      '8월',
+      '9월',
+      '10월',
+      '11월',
+      '12월',
     ];
     final currentMonthYear = '${today.year} ${monthNames[today.month - 1]}';
 
@@ -149,7 +162,7 @@ class _MainScreenState extends State<MainScreen> {
               children: [
                 // 고정 헤더
                 _buildHeader(),
-                
+
                 // 스크롤 가능한 콘텐츠
                 Expanded(
                   child: SingleChildScrollView(
@@ -161,14 +174,20 @@ class _MainScreenState extends State<MainScreen> {
                     ),
                     child: Column(
                       children: [
+                        RecommendedWorkoutCard(
+                          onAddToRoutine: () {
+                            // 여기에 루틴 추가 기능 구현
+                            print('루틴에 추가!');
+                          },
+                        ),
                         // 운동 캘린더 위젯
                         _buildCalendarWidget(currentMonthYear),
                         const SizedBox(height: 24),
-                        
+
                         // 주간 운동 그래프
                         _buildWorkoutGraph(),
                         const SizedBox(height: 24),
-                        
+
                         // 하단 액션 버튼들
                         _buildActionButtons(),
                       ],
@@ -236,9 +255,7 @@ class _MainScreenState extends State<MainScreen> {
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
-        border: Border(
-          bottom: BorderSide(color: Colors.grey.shade200),
-        ),
+        border: Border(bottom: BorderSide(color: Colors.grey.shade200)),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.05),
@@ -277,7 +294,7 @@ class _MainScreenState extends State<MainScreen> {
               ),
             ],
           ),
-          
+
           // 로고
           Row(
             children: [
@@ -289,7 +306,7 @@ class _MainScreenState extends State<MainScreen> {
                   color: Colors.grey.shade300,
                 ),
                 // 실제 앱 아이콘 이미지를 사용하려면:
-                // child: Image.asset('assets/app_icon.png'),
+                child: Image.asset('assets/pro.png'),
               ),
               const SizedBox(width: 8),
               const Text(
@@ -302,7 +319,7 @@ class _MainScreenState extends State<MainScreen> {
               ),
             ],
           ),
-          
+
           // 마이페이지 버튼
           IconButton(
             icon: const Icon(Icons.person_outline, size: 24),
@@ -321,10 +338,7 @@ class _MainScreenState extends State<MainScreen> {
   // 캘린더 위젯
   Widget _buildCalendarWidget(String currentMonthYear) {
     final weekDays = ['일', '월', '화', '수', '목', '금', '토'];
-    final displayDays = calendarDays
-        .skip(currentWeek * 7)
-        .take(7)
-        .toList();
+    final displayDays = calendarDays.skip(currentWeek * 7).take(7).toList();
 
     return Container(
       decoration: BoxDecoration(
@@ -351,10 +365,7 @@ class _MainScreenState extends State<MainScreen> {
                   ),
                   Text(
                     currentMonthYear,
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Colors.grey.shade600,
-                    ),
+                    style: TextStyle(fontSize: 14, color: Colors.grey.shade600),
                   ),
                 ],
               ),
@@ -397,15 +408,16 @@ class _MainScreenState extends State<MainScreen> {
             ],
           ),
           const SizedBox(height: 16),
-          
+
           // 캘린더 그리드
           GridView.builder(
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: 7,
-              mainAxisSpacing: 4,
-              crossAxisSpacing: 4,
+              mainAxisSpacing: 2,
+              crossAxisSpacing: 2,
+              childAspectRatio: 1.2,
             ),
             itemCount: 14, // 7 (요일) + 7 (날짜)
             itemBuilder: (context, index) {
@@ -414,24 +426,21 @@ class _MainScreenState extends State<MainScreen> {
                 return Center(
                   child: Text(
                     weekDays[index],
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: Colors.grey.shade500,
-                    ),
+                    style: TextStyle(fontSize: 12, color: Colors.grey.shade500),
                   ),
                 );
               } else {
                 // 날짜 표시
                 final dayIndex = index - 7;
                 final day = displayDays[dayIndex];
-                
+
                 return Container(
                   decoration: BoxDecoration(
                     color: day.hasWorkout
                         ? const Color(0xFFFF5757)
                         : day.isToday
-                            ? const Color(0xFFDCEBFE)
-                            : Colors.transparent,
+                        ? const Color(0xFFDCEBFE)
+                        : Colors.transparent,
                     borderRadius: BorderRadius.circular(4),
                   ),
                   child: Center(
@@ -442,10 +451,10 @@ class _MainScreenState extends State<MainScreen> {
                         color: day.isToday
                             ? const Color(0xFF2563EB)
                             : day.hasWorkout
-                                ? Colors.white
-                                : day.isCurrentMonth
-                                    ? const Color(0xFF111827)
-                                    : Colors.grey.shade400,
+                            ? Colors.white
+                            : day.isCurrentMonth
+                            ? const Color(0xFF111827)
+                            : Colors.grey.shade400,
                         fontWeight: day.isToday || day.hasWorkout
                             ? FontWeight.w500
                             : FontWeight.normal,
@@ -456,8 +465,9 @@ class _MainScreenState extends State<MainScreen> {
               }
             },
           ),
+
           const SizedBox(height: 16),
-          
+
           // 연속 출석 메시지
           Container(
             decoration: BoxDecoration(
@@ -479,10 +489,7 @@ class _MainScreenState extends State<MainScreen> {
                 const SizedBox(height: 4),
                 Text(
                   '꾸준한 운동으로 목표를 달성해보세요',
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: Colors.grey.shade600,
-                  ),
+                  style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
                 ),
               ],
             ),
@@ -524,17 +531,14 @@ class _MainScreenState extends State<MainScreen> {
                   const SizedBox(width: 8),
                   Text(
                     '운동시간',
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: Colors.grey.shade500,
-                    ),
+                    style: TextStyle(fontSize: 12, color: Colors.grey.shade500),
                   ),
                 ],
               ),
             ],
           ),
           const SizedBox(height: 16),
-          
+
           // 그래프
           SizedBox(
             height: 180,
@@ -545,10 +549,7 @@ class _MainScreenState extends State<MainScreen> {
                   drawVerticalLine: false,
                   horizontalInterval: 30,
                   getDrawingHorizontalLine: (value) {
-                    return FlLine(
-                      color: Colors.grey.shade100,
-                      strokeWidth: 1,
-                    );
+                    return FlLine(color: Colors.grey.shade100, strokeWidth: 1);
                   },
                 ),
                 titlesData: FlTitlesData(
@@ -559,13 +560,19 @@ class _MainScreenState extends State<MainScreen> {
                       interval: 30,
                       getTitlesWidget: (value, meta) {
                         String label = '';
-                        if (value == 0) label = '0분';
-                        else if (value == 30) label = '30분';
-                        else if (value == 60) label = '1시간';
-                        else if (value == 90) label = '1.5시간';
-                        else if (value == 120) label = '2시간';
-                        else if (value >= 150) label = '3시간+';
-                        
+                        if (value == 0)
+                          label = '0분';
+                        else if (value == 30)
+                          label = '30분';
+                        else if (value == 60)
+                          label = '1시간';
+                        else if (value == 90)
+                          label = '1.5시간';
+                        else if (value == 120)
+                          label = '2시간';
+                        else if (value >= 150)
+                          label = '3시간+';
+
                         return Text(
                           label,
                           style: TextStyle(
@@ -587,7 +594,8 @@ class _MainScreenState extends State<MainScreen> {
                       showTitles: true,
                       reservedSize: 30,
                       getTitlesWidget: (value, meta) {
-                        if (value.toInt() >= 0 && value.toInt() < workoutData.length) {
+                        if (value.toInt() >= 0 &&
+                            value.toInt() < workoutData.length) {
                           return Padding(
                             padding: const EdgeInsets.only(top: 8),
                             child: Text(
@@ -641,7 +649,7 @@ class _MainScreenState extends State<MainScreen> {
             ),
           ),
           const SizedBox(height: 16),
-          
+
           // 자세히보기 버튼
           TextButton(
             onPressed: () {
@@ -651,10 +659,7 @@ class _MainScreenState extends State<MainScreen> {
             },
             child: Text(
               '자세히보기',
-              style: TextStyle(
-                fontSize: 12,
-                color: Colors.grey.shade500,
-              ),
+              style: TextStyle(fontSize: 12, color: Colors.grey.shade500),
             ),
           ),
         ],
@@ -687,16 +692,13 @@ class _MainScreenState extends State<MainScreen> {
               children: [
                 Icon(Icons.fitness_center, size: 20, color: Colors.white),
                 SizedBox(width: 8),
-                Text(
-                  '운동 시작하기',
-                  style: TextStyle(color: Colors.white),
-                ),
+                Text('운동 시작하기', style: TextStyle(color: Colors.white)),
               ],
             ),
           ),
         ),
         const SizedBox(height: 12),
-        
+
         // 루틴 불러오기 버튼
         SizedBox(
           width: double.infinity,
@@ -712,12 +714,13 @@ class _MainScreenState extends State<MainScreen> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(Icons.upload_outlined, size: 20, color: Colors.grey.shade700),
-                const SizedBox(width: 8),
-                Text(
-                  '루틴 불러오기',
-                  style: TextStyle(color: Colors.grey.shade700),
+                Icon(
+                  Icons.upload_outlined,
+                  size: 20,
+                  color: Colors.grey.shade700,
                 ),
+                const SizedBox(width: 8),
+                Text('루틴 불러오기', style: TextStyle(color: Colors.grey.shade700)),
               ],
             ),
           ),
@@ -738,20 +741,18 @@ class _MainScreenState extends State<MainScreen> {
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
-        border: Border(
-          top: BorderSide(color: Colors.grey.shade200),
-        ),
+        border: Border(top: BorderSide(color: Colors.grey.shade200)),
       ),
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: navItems.map((item) {
           final isActive = activeTab == item['id'];
-          
+
           return InkWell(
             onTap: () {
               setState(() => activeTab = item['id'] as String);
-              
+
               if (item['id'] != '운동') {
                 // 페이지 이동: 각 탭에 해당하는 페이지로 이동
                 // navigateToPage(item['label'] as String);
@@ -789,6 +790,142 @@ class _MainScreenState extends State<MainScreen> {
             ),
           );
         }).toList(),
+      ),
+    );
+  }
+}
+
+class RecommendedWorkoutCard extends StatelessWidget {
+  final VoidCallback onAddToRoutine;
+
+  const RecommendedWorkoutCard({super.key, required this.onAddToRoutine});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 400, // 💡 높이 고정
+      margin: const EdgeInsets.only(bottom: 16),
+      padding: const EdgeInsets.all(20), // 전체 여백도 늘림
+      decoration: BoxDecoration(
+        border: Border.all(color: Colors.redAccent),
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Row(
+            children: [
+              Icon(Icons.trending_up, size: 20, color: Color(0xFFFF5757)),
+              SizedBox(width: 6),
+              Text(
+                '추천 운동',
+                style: TextStyle(fontWeight: FontWeight.w700, fontSize: 16),
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
+          const Row(
+            children: [
+              Icon(Icons.info_outline, size: 16, color: Colors.red),
+              SizedBox(width: 6),
+              Text(
+                '마지막 등 운동 후 5일 경과!',
+                style: TextStyle(
+                  fontSize: 14,
+                  color: Colors.red,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 20),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              ClipRRect(
+                borderRadius: BorderRadius.circular(12),
+                child: Image.asset(
+                  'assets/dead.jpg', // 또는 업로드한 이미지 사용
+                  width: 100,
+                  height: 100,
+                  fit: BoxFit.cover,
+                ),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      '데드리프트',
+                      style: TextStyle(
+                        fontWeight: FontWeight.w700,
+                        fontSize: 18,
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    const Text(
+                      '전신 근력 발달에 효과적인 복합 운동',
+                      style: TextStyle(fontSize: 14, color: Color(0xFF6B7280)),
+                    ),
+                    const SizedBox(height: 10),
+                    Row(
+                      children: [
+                        _buildLabel('등', fontSize: 12),
+                        const SizedBox(width: 8),
+                        _buildLabel(
+                          '강도: 고',
+                          fontSize: 12,
+                          color: Color(0xFFFFF7ED),
+                          textColor: Color(0xFFEA580C),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const Spacer(),
+          SizedBox(
+            width: double.infinity,
+            child: OutlinedButton.icon(
+              onPressed: onAddToRoutine,
+              icon: const Icon(Icons.add, size: 18, color: Colors.black),
+              label: const Text(
+                '루틴에 추가하기',
+                style: TextStyle(color: Colors.black, fontSize: 16),
+              ),
+              style: OutlinedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(vertical: 14),
+                textStyle: const TextStyle(fontSize: 16),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  static Widget _buildLabel(
+    String text, {
+    double fontSize = 12,
+    Color color = const Color(0xFFF3F4F6),
+    Color textColor = const Color(0xFF374151),
+  }) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      decoration: BoxDecoration(
+        color: color,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Text(
+        text,
+        style: TextStyle(
+          fontSize: fontSize,
+          color: textColor,
+          fontWeight: FontWeight.w600,
+        ),
       ),
     );
   }
